@@ -14,9 +14,9 @@ var db1 = mysql.createConnection({
 
 var db2 = mysql.createConnection({
     host: 'localhost',
-    user: 'smsdba_smsdba2',
-    password: 'nnv9I^b7KantGk',
-    database: 'smsdba_ntsmsdb',
+    user: 'dbserver_nutandm',
+    password: 'zchipern*h68Gh',
+    database: 'dbserver_nutandm',
     debug: false,
   
   });
@@ -117,7 +117,7 @@ const postpaymentTransaction = (_result) => {
     bankname:data.BANKNAME,
   }
   console.log(postvalues)
-  db1.query(query, [postvalues,data.ORDERID], function (err, result, fields) {
+  db2.query(query, [postvalues,data.ORDERID], function (err, result, fields) {
       if (err) throw err;
     
   })
