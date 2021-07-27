@@ -86,20 +86,16 @@ console.log(amount,order_id)
 
 module.exports.paywithpaytmresponse = async function (req, res) {
     responsePayment(req.body).then(
-       
         success => {
             console.log(req.body)
             postpaymentTransaction(req.body);
-
-            res.render("response.ejs", {resultData: "true", responseData: success});
+            res.render("response.ejs", { resultData: "true", responseData: success,link: "https://nutandigitalmart.com/paymentsucess/"+req.body.ORDERID});
         },
         error => {
             res.send(error);
         }
     );
 }
-
-
 
 const postpaymentTransaction = (_result) => {
     const data=_result;
