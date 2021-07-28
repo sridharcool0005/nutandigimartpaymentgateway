@@ -98,6 +98,23 @@ module.exports.paywithpaytmresponse = async function (req, res) {
     );
 }
 
+
+///***paytm live response */
+
+// order_id		= ORDERID: '1041',
+// DONT STORE		  MID: 'KWkYwC22241162990459',
+// payment_gateway_txn_id  = TXNID: '20210728111212800110168841002830164',
+//   total_amount_paid 	= TXNAMOUNT: '589.00',
+//   payment_mode 		= PAYMENTMODE: 'NB',
+//   currency 		= CURRENCY: 'INR',
+//   txn_date 		= TXNDATE: '2021-07-28 15:46:03.0',
+//   payment_status 	= STATUS: 'TXN_SUCCESS',
+//   payment_status_code 	= RESPCODE: '01',
+//   payment_resp_msg	= RESPMSG: 'Txn Success',
+//   gatewayname		= GATEWAYNAME: 'SBI',
+//   bank_txn_id 		= BANKTXNID: '10570942712',
+//   bankname 		= BANKNAME: 'State Bank of India',
+
 const postpaymentTransaction = async (_result) => {
     const data = _result;
     const updatequery = "UPDATE portal_sales_history SET ? where order_id =? ";
