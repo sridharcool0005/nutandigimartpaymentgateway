@@ -1,4 +1,4 @@
-const {initPayment, responsePayment} = require("../paytm/services/index");
+const { initPayment, responsePayment } = require("../paytm/services/index");
 
 var mysql = require('mysql');
 
@@ -18,9 +18,10 @@ var db2 = mysql.createConnection({
     password: 'zchipern*h68Gh',
     database: 'dbserver_nutandm',
     debug: false,
-  
-  });
 
+});
+const util = require('util');
+const query = util.promisify(db2.query).bind(db2);
 
 module.exports.getOrderConfirm = async function (req, res) {
     const { agent_id, order_id } = req.query;
@@ -39,7 +40,7 @@ module.exports.getOrderConfirm = async function (req, res) {
     } else {
 
         const query1 = "SELECT `smsportal_authkey` FROM `app_clients_master` WHERE `agent_id` =?"
-        await db1.query(query1,[agent_id], function (err, response, fields) {
+        await db1.query(query1, [agent_id], function (err, response, fields) {
             if (!response.length) {
                 res.status(400).send({
                     status: "error",
@@ -50,7 +51,7 @@ module.exports.getOrderConfirm = async function (req, res) {
                 if (authkey === smsportal_authkey) {
                     res.send({
                         status: "success",
-                        paygateway_url:'http://payment.nutanapp.in/'+order_id
+                        paygateway_url: 'http://payment.nutanapp.in/' + order_id
 
                     });
                 }
@@ -67,10 +68,10 @@ module.exports.getOrderConfirm = async function (req, res) {
 }
 
 
-module.exports.paywithpaytm = async function (req, res){
-const {amount,order_id}= req.body;
-console.log(amount,order_id)
-    initPayment(amount,order_id).then(
+module.exports.paywithpaytm = async function (req, res) {
+    const { amount, order_id } = req.body;
+    console.log(amount, order_id)
+    initPayment(amount, order_id).then(
         success => {
             res.render("paytmRedirect.ejs", {
                 resultData: success,
@@ -89,7 +90,7 @@ module.exports.paywithpaytmresponse = async function (req, res) {
         success => {
             console.log(req.body)
             postpaymentTransaction(req.body);
-            res.render("response.ejs", { resultData: "true", responseData: success,link: "https://nutandigitalmart.com/paymentsucess/"+req.body.ORDERID});
+            res.render("response.ejs", { resultData: "true", responseData: success, link: "https://nutandigitalmart.com/paymentsucess/" + req.body.ORDERID });
         },
         error => {
             res.send(error);
@@ -97,58 +98,90 @@ module.exports.paywithpaytmresponse = async function (req, res) {
     );
 }
 
-const postpaymentTransaction = (_result) => {
-    const data=_result;
-    const query = "UPDATE portal_sales_history SET ? where order_id =? ";
+const postpaymentTransaction =async (_result) => {
+    const data = _result;
+    const updatequery = "UPDATE portal_sales_history SET ? where order_id =? ";
     const postvalues = {
-    mid:data.MID,
-    payment_gateway_txn_id:data.TXNID,
-    total_amount_paid:data.TXNAMOUNT,
-    payment_mode:data.PAYMENTMODE,
-    payment_status:data.STATUS,
-    payment_status_code:data.RESPCODE,
-    notes:data.RESPMSG,
-    gatewayname:data.GATEWAYNAME,
-    bank_txn_id:data.BANKTXNID,
-    bankname:data.BANKNAME,
-  }
-  console.log(postvalues)
-  db2.query(query, [postvalues,data.ORDERID], function (err, result, fields) {
-      if (err) throw err;
-    
-  })
-  }
-  
+        mid: data.MID,
+        payment_gateway_txn_id: data.TXNID,
+        total_amount_paid: data.TXNAMOUNT,
+        payment_mode: data.PAYMENTMODE,
+        payment_status: data.STATUS,
+        payment_status_code: data.RESPCODE,
+        notes: data.RESPMSG,
+        gatewayname: data.GATEWAYNAME,
+        bank_txn_id: data.BANKTXNID,
+        bankname: data.BANKNAME,
+    }
+    console.log(postvalues)
+
+    await query(updatequery, [postvalues, data.ORDERID]);
+    const fetchpackdetails = "select a.client_id,a.order_id,b.client_category, c.package_validity_in_months, b.profile_id, b.email from portal_sales_history a, app_clients_master b, portal_premiumplans_master c where a.order_id =? and a.client_id=b.client_id and a.package_id=c.package_id;"
+    const result = await query(fetchpackdetails, [data.ORDERID]);
+    const client_id = result[0].client_id;
+    const validity = result[0].package_validity_in_months
+    const client_category = result[0].client_category;
+    var date = new Date();
+    date.setMonth(date.getMonth() + validity);
+    console.log(date)
+    const updatequery2 = "UPDATE app_clients_master  SET ? where client_id =? ";
+    let expiryDate = '0000/00/00 00:00';
+    if (client_category == 'vcard') {
+        expiryDate = new Date();
+        expiryDate.setDate(expiryDate.getMonth() + validity);
+    }
+    let ws_expiry_date = '0000/00/00 00:00';
+    if (client_category == 'ws') {
+        ws_expiry_date = new Date();
+        ws_expiry_date.setDate(ws_expiry_date.getMonth() + validity);
+    }
+
+    let dc_expiry_date = '0000/00/00 00:00';
+    if (client_category == 'dc') {
+        dc_expiry_date = new Date();
+        dc_expiry_date.setDate(dc_expiry_date.getMonth() + validity);
+    }
+
+    const values = {
+        expiry_date: expiry_date,
+        ws_expiry_date: ws_expiry_date,
+        dc_expiry_date: dc_expiry_date
+    }
+
+    await query(updatequery2, [values, client_id]);
+
+}
+
 
 module.exports.getorderDetails = async (req, res) => {
 
-    const orderIdApi='https://portalapi.nutansms.in/fetchOrderdetailsV1.php';
- 
-    const { order_id} = req.body;
+    const orderIdApi = 'https://portalapi.nutansms.in/fetchOrderdetailsV1.php';
+
+    const { order_id } = req.body;
     const options = {
-      url: orderIdApi,
-      qs: { order_id: 'autosms/'+order_id},
-      headers: {
-        'Authorization': 'nh7bhg5f*c#fd@sm9'
-      },
-    
-      json: true,
-      method: 'Post',
+        url: orderIdApi,
+        qs: { order_id: 'autosms/' + order_id },
+        headers: {
+            'Authorization': 'nh7bhg5f*c#fd@sm9'
+        },
+
+        json: true,
+        method: 'Post',
     }
     console.log(options)
     request(options, (err, response, body) => {
-      // console.log(err)
-      // console.log(response)
-      console.log(body)
+        // console.log(err)
+        // console.log(response)
+        console.log(body)
 
-      if (err) {
-        res.json(err)
-      } else {
-        res.json(body)
+        if (err) {
+            res.json(err)
+        } else {
+            res.json(body)
 
-      }
+        }
     });
-  
+
 }
 
 
