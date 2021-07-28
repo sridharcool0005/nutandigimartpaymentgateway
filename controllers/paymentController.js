@@ -164,7 +164,7 @@ const postpaymentTransaction = async (_result) => {
     }
 
     const values = {
-        expiry_date: expiry_date,
+        expiry_date: expiryDate,
         ws_expiry_date: ws_expiry_date,
         dc_expiry_date: dc_expiry_date
     }
