@@ -72,7 +72,6 @@ module.exports.paywithpaytm = async function (req, res) {
     console.log(amount, order_id)
     initPayment(amount, order_id).then(
         success => {
-            console.log(success)
             res.render("paytmRedirect.ejs", {
                 resultData: success,
 
@@ -112,6 +111,7 @@ const postpaymentTransaction = async (_result) => {
         gatewayname: data.GATEWAYNAME,
         bank_txn_id: data.BANKTXNID,
         bankname: data.BANKNAME,
+        currency: data.CURRENCY
     }
     console.log(postvalues)
 
