@@ -136,7 +136,7 @@ const postpaymentTransaction = async (_result) => {
     await query(updatequery, [postvalues, data.ORDERID]);
 
     ////****update expiry date**************** */
-    const fetchpackdetails = "select a.client_id,a.order_id,b.client_category, c.package_validity_in_months, b.profile_id, b.email from portal_sales_history a, app_clients_master b, portal_premiumplans_master c where a.order_id =? and a.client_id=b.client_id and a.package_id=c.package_id;"
+    const fetchpackdetails = "select a.client_id,a.order_id,b.client_category, c.package_validity_in_months, b.profile_id, b.email from portal_sales_history a, app_clients_master b, portal_premiumplans_master c where a.order_id =? and a.client_id=b.client_id and a.package_id=c.package_id"
     const result = await query(fetchpackdetails, [data.ORDERID]);
     console.log(result)
     const client_id = result[0].client_id;
