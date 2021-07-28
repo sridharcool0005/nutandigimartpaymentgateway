@@ -102,12 +102,10 @@ const postpaymentTransaction = async (_result) => {
     const data = _result;
     const updatequery = "UPDATE portal_sales_history SET ? where order_id =? ";
     const postvalues = {
-        mid: data.MID,
         payment_gateway_txn_id: data.TXNID,
         total_amount_paid: data.TXNAMOUNT,
         payment_mode: data.PAYMENTMODE,
-        payment_status: data.STATUS,
-        payment_status_code: data.RESPCODE,
+        payment_status_code: data.STATUS,
         notes: data.RESPMSG,
         gatewayname: data.GATEWAYNAME,
         bank_txn_id: data.BANKTXNID,
@@ -115,15 +113,18 @@ const postpaymentTransaction = async (_result) => {
     }
     console.log(postvalues)
 
+
     await query(updatequery, [postvalues, data.ORDERID]);
+
+    ////****update expiry date**************** */
     const fetchpackdetails = "select a.client_id,a.order_id,b.client_category, c.package_validity_in_months, b.profile_id, b.email from portal_sales_history a, app_clients_master b, portal_premiumplans_master c where a.order_id =? and a.client_id=b.client_id and a.package_id=c.package_id;"
     const result = await query(fetchpackdetails, [data.ORDERID]);
     const client_id = result[0].client_id;
     const validity = result[0].package_validity_in_months
     const client_category = result[0].client_category;
-    var date = new Date();
-    date.setMonth(date.getMonth() + validity);
-    console.log(date)
+    // var date = new Date();
+    // date.setMonth(date.getMonth() + validity);
+    // console.log(date)
     const updatequery2 = "UPDATE app_clients_master  SET ? where client_id =?";
     let expiryDate = '0000/00/00 00:00';
     if (client_category == 'vcard') {
