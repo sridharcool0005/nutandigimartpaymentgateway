@@ -98,7 +98,7 @@ module.exports.paywithpaytmresponse = async function (req, res) {
     );
 }
 
-const postpaymentTransaction =async (_result) => {
+const postpaymentTransaction = async (_result) => {
     const data = _result;
     const updatequery = "UPDATE portal_sales_history SET ? where order_id =? ";
     const postvalues = {
@@ -124,7 +124,7 @@ const postpaymentTransaction =async (_result) => {
     var date = new Date();
     date.setMonth(date.getMonth() + validity);
     console.log(date)
-    const updatequery2 = "UPDATE app_clients_master  SET ? where client_id =? ";
+    const updatequery2 = "UPDATE app_clients_master  SET ? where client_id =?";
     let expiryDate = '0000/00/00 00:00';
     if (client_category == 'vcard') {
         expiryDate = new Date();
