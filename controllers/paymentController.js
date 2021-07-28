@@ -149,18 +149,18 @@ const postpaymentTransaction = async (_result) => {
     let expiryDate = '0000/00/00 00:00';
     if (client_category == 'vcard') {
         expiryDate = new Date();
-        expiryDate.setDate(expiryDate.getMonth() + validity);
+        expiryDate.setMonth(expiryDate.getMonth() + validity);
     }
     let ws_expiry_date = '0000/00/00 00:00';
     if (client_category == 'ws') {
         ws_expiry_date = new Date();
-        ws_expiry_date.setDate(ws_expiry_date.getMonth() + validity);
+        ws_expiry_date.setMonth(ws_expiry_date.getMonth() + validity);
     }
 
     let dc_expiry_date = '0000/00/00 00:00';
     if (client_category == 'dc') {
         dc_expiry_date = new Date();
-        dc_expiry_date.setDate(dc_expiry_date.getMonth() + validity);
+        dc_expiry_date.setMonth(dc_expiry_date.getMonth() + validity);
     }
 
     const values = {
