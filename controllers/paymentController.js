@@ -64,7 +64,6 @@ module.exports.getOrderConfirm = async function (req, res) {
             }
         });
     }
-
 }
 
 
@@ -73,8 +72,10 @@ module.exports.paywithpaytm = async function (req, res) {
     console.log(amount, order_id)
     initPayment(amount, order_id).then(
         success => {
+            console.log(success)
             res.render("paytmRedirect.ejs", {
                 resultData: success,
+
                 paytmFinalUrl: process.env.PAYTM_FINAL_URL
             });
         },
