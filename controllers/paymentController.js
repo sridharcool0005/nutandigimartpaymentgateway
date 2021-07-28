@@ -108,7 +108,7 @@ const postpaymentTransaction = async (_result) => {
         payment_mode: data.PAYMENTMODE,
         payment_status: data.STATUS,
         payment_status_code: data.RESPCODE,
-        notes: data.RESPMSG,
+        payment_resp_msg: data.RESPMSG,
         gatewayname: data.GATEWAYNAME,
         bank_txn_id: data.BANKTXNID,
         bankname: data.BANKNAME,
