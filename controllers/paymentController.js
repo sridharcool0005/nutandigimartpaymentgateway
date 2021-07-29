@@ -95,7 +95,6 @@ module.exports.paywithpaytmresponse = async function (req, res) {
  
             }else{
                 res.render("response.ejs", { resultData: "true", responseData: success, link: "https://nutandigitalmart.com/paymentsucess/" + req.body.ORDERID });
-
             }
         },
         error => {
