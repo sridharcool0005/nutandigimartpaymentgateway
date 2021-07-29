@@ -66,15 +66,15 @@ module.exports.getOrderConfirm = async function (req, res) {
     }
 }
 
-
+let isadmin;
 module.exports.paywithpaytm = async function (req, res) {
-    const { amount, order_id } = req.body;
+    const { amount, order_id, admin } = req.body;
+    isadmin = admin;
     console.log(amount, order_id)
     initPayment(amount, order_id).then(
         success => {
             res.render("paytmRedirect.ejs", {
                 resultData: success,
-
                 paytmFinalUrl: process.env.PAYTM_FINAL_URL
             });
         },
@@ -90,7 +90,13 @@ module.exports.paywithpaytmresponse = async function (req, res) {
         success => {
             console.log(req.body)
             postpaymentTransaction(req.body);
-            res.render("response.ejs", { resultData: "true", responseData: success, link: "https://nutandigitalmart.com/paymentsucess/" + req.body.ORDERID });
+            if(isadmin){
+                res.render("response.ejs", { resultData: "true", responseData: success, link: "https://admin.nutandigitalmart.com/paymentsucess"});
+ 
+            }else{
+                res.render("response.ejs", { resultData: "true", responseData: success, link: "https://nutandigitalmart.com/paymentsucess/" + req.body.ORDERID });
+
+            }
         },
         error => {
             res.send(error);
